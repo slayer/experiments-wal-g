@@ -1,0 +1,8 @@
+#!/bin/sh
+file="$1"
+
+set -e -x
+
+. $(dirname $0)/env
+
+/usr/local/bin/wal-g $@

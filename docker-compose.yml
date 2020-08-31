@@ -1,0 +1,27 @@
+version: '3.0'
+
+services:
+  minio:
+    image: minio/minio
+    command: server /data
+    ports:
+      - 127.0.0.1:9000:9000
+    volumes:
+      - ./minio:/data
+    env_file: ./env
+
+  pg1: &pg
+    restart: on-failure
+    build: ./image
+    env_file: ./env
+    volumes:
+      - ./env:/opt/wg/env
+      - ./wg:/opt/wg
+      - ./pg1:/var/lib/postgresql/data
+
+  pg2:
+    <<: *pg
+    volumes:
+      - ./env:/opt/wg/env
+      - ./wg:/opt/wg
+      - ./pg2:/var/lib/postgresql/data
