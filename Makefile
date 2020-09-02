@@ -28,15 +28,18 @@ pg2-logical-slave-setup:
 	$(DC_EXEC) pg1 psql -c "CREATE PUBLICATION slave_pub FOR ALL TABLES;"
 	$(DC_EXEC) pg2 psql -c "CREATE SUBSCRIPTION slave_sub CONNECTION 'host=pg1 dbname=app user=replication password=1234' PUBLICATION slave_pub;"
 
-pgbench-init-small:
+pg1-pgbench-init-small:
 	$(DC_EXEC) -e PGPASSWORD=$(POSTGRES_PASSWORD) pg1 pgbench -U$(POSTGRES_USER) -i -s2
 
-pgbench-init:
+pg1-pgbench-init:
 	$(DC_EXEC) -e PGPASSWORD=$(POSTGRES_PASSWORD) pg1 pgbench -U$(POSTGRES_USER) -i -s50
 
-pgbench-init-big:
+pg1-pgbench-init-big:
 	$(DC_EXEC) -e PGPASSWORD=$(POSTGRES_PASSWORD) pg1 pgbench -U$(POSTGRES_USER) -i -s500
 
+pg1-replication-stat:
+	$(DC_EXEC) pg1 psql -c '\x' -c "SELECT * FROM pg_stat_replication;"
+	$(DC_EXEC) pg1 psql -c '\x' -c "SELECT * FROM pg_replication_slots;"
 sh:
 	docker-compose exec pg1 bash
 
@@ -51,6 +54,8 @@ pg2-sh:
 	docker-compose exec pg2 bash
 pg2-psql:
 	docker-compose exec pg2 psql
+pg2-replication-stat:
+	$(DC_EXEC) pg2 psql -c '\x' -c "SELECT * FROM pg_stat_wal_receiver;" -c "select pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn(), pg_last_xact_replay_timestamp();"
 
 
 
