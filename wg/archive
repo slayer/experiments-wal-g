@@ -1,0 +1,14 @@
+#!/bin/sh
+
+dir=$(dirname $0)
+file=$1
+
+${dir}/walg-pg wal-push ${file}
+
+mkdir -p /tmp/shared
+
+echo "Copying ${file}..."
+cp ${file} /tmp/shared
+# echo "rsync -a %p postgres@slave:/home/postgresql_wal/${file}'
+
+

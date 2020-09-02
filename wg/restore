@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -x
+file="$1"
+path="$2"
+
+echo "Restoring ${file} -> ${path}..."
+cp /tmp/shared/${file} ${path}

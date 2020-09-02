@@ -2,6 +2,7 @@ version: '3.0'
 
 services:
   minio:
+    container_name: minio
     image: minio/minio
     command: server /data
     ports:
@@ -11,17 +12,28 @@ services:
     env_file: ./env
 
   pg1: &pg
+    container_name: pg1
     restart: on-failure
     build: ./image
     env_file: ./env
+    command: "postgres -c 'config_file=/etc/postgresql/pg1-postgresql.conf' -c 'hba_file=/etc/postgresql/pg_hba.conf'"
     volumes:
+      - ./conf/pg1-postgresql.conf:/etc/postgresql/pg1-postgresql.conf
+      - ./conf/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./pg1:/var/lib/postgresql/data
+      - ./shared:/tmp/shared
       - ./env:/opt/wg/env
       - ./wg:/opt/wg
-      - ./pg1:/var/lib/postgresql/data
 
   pg2:
     <<: *pg
+    container_name: pg2
+    command: "postgres -c 'config_file=/etc/postgresql/pg2-postgresql.conf' -c 'hba_file=/etc/postgresql/pg_hba.conf'"
     volumes:
+      - ./conf/pg2-postgresql.conf:/etc/postgresql/pg2-postgresql.conf
+      - ./conf/pg2-recovery.conf:/etc/postgresql/pg2-recovery.conf
+      - ./conf/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./pg2:/var/lib/postgresql/data
+      - ./shared:/tmp/shared
       - ./env:/opt/wg/env
       - ./wg:/opt/wg
-      - ./pg2:/var/lib/postgresql/data
